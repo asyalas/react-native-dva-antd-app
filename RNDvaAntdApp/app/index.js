@@ -19,5 +19,4 @@ const app = dva({
 })
 
 const App = app.start(Router)
-debugger
 AppRegistry.registerComponent('RNDvaAntdApp', () => App)

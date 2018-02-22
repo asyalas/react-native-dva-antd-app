@@ -33,7 +33,6 @@ let AppNavigator
 
 const addListener = createReduxBoundAddListener('root')
 
-@connect(({ app, router }) => ({ app, router }))
 export default class Router extends PureComponent {
   componentWillMount() {
     const { tabBar, route } = this.props._route
