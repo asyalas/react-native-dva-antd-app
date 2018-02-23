@@ -6,7 +6,7 @@ import { Button, Touchable } from '../../components'
 
 import { createAction, NavigationActions } from '../../utils'
 
-@connect(({ app }) => ({ ...app }))
+@connect()
 class Login extends Component {
   static navigationOptions = {
     title: 'Login',
@@ -16,9 +16,6 @@ class Login extends Component {
     this.props.navigation.navigate('Main')
   }
 
-  onClose = () => {
-    this.props.navigation.goBack()
-  }
 
   render() {
     const { fetching } = this.props
@@ -29,11 +26,6 @@ class Login extends Component {
           <ActivityIndicator />
         ) : (
           <Button text="Login" onPress={this.onLogin} />
-        )}
-        {!fetching && (
-          <Touchable style={styles.close} text="Close" onPress={this.onClose}>
-            <Text>Close</Text>
-          </Touchable>
         )}
       </View>
     )
