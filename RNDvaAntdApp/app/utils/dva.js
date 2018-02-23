@@ -47,8 +47,6 @@ export default options => {
   let app, value
 
   app = create(options)
-  // 初始化路由
-  app._route = []
   // 注册model
   if (!global.registered) {
     const manifest = require('../src/manifest')
@@ -63,9 +61,7 @@ export default options => {
   // 2.插件
   app.use(createLoading({ effects: true }))
   const store = app._store
-
-  app.start = Router => () => <Provider store={store}>{<Router _route={_route} />}</Provider>
+  app.start = Router => () => <Provider store={store}>{<Router _route={_route} _registerRouteModel={app.model}/>}</Provider>
   app.getStore = () => store
-
   return app
 }

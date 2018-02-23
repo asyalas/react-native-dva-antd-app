@@ -4,12 +4,9 @@ import { Toast } from 'antd-mobile'
 import dva from './utils/dva'
 import Router, { routerMiddleware } from './router'
 
-import appModel from './models/app'
-import routerModel from './models/router'
-
 const app = dva({
   initialState: {},
-  models: [appModel, routerModel],
+  models: [],
   onAction: [routerMiddleware],
   // effect 执行错误或 subscription 通过 done 主动抛错时触发，可用于管理全局出错状态
   onError(e) {

@@ -6,7 +6,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import RN from 'react-native'
 
 const _Button = RN.Button
-@connect(state => ({}))
+@connect(({router}) => ({router}))
 export default class Account3 extends React.Component {
   static navigationOptions = ({ navigation }) => {
     const { params } = navigation.state

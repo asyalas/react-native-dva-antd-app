@@ -11,14 +11,25 @@ import {
   createReduxBoundAddListener,
   createReactNavigationReduxMiddleware,
 } from 'react-navigation-redux-helpers'
-import { connect } from 'react-redux'
-
 import Login from './src/Login'
+import { delay, } from './utils'
+import { connect } from 'react-redux'
+const actions = [
+  NavigationActions.BACK,
+  NavigationActions.INIT,
+  NavigationActions.NAVIGATE,
+  NavigationActions.RESET,
+  NavigationActions.SET_PARAMS,
+  NavigationActions.URI,
+]
 
+
+//react-navigation中间件
 export const routerMiddleware = createReactNavigationReduxMiddleware(
   'root',
   state => state.router
 )
+//获取当前的路由名
 function getCurrentScreen(navigationState) {
   if (!navigationState) {
     return null
@@ -33,9 +44,13 @@ let AppNavigator
 
 const addListener = createReduxBoundAddListener('root')
 
+@connect(({router}) =>({router}))
 export default class Router extends PureComponent {
   componentWillMount() {
-    const { tabBar, route } = this.props._route
+    console.log('componentWillMount')
+    const { tabBar, route } = this.props._route;
+    const { _registerRouteModel } = this.props;
+    //配置tabBar
     const HomeNavigator = TabNavigator(tabBar, {
       initialRouteName: '/Account/Account1',
       tabBarComponent: TabBarBottom,
@@ -47,7 +62,7 @@ export default class Router extends PureComponent {
       animationEnabled: true,
       tabBarOptions: {},
     })
-
+    //配置主要页面
     const MainNavigator = StackNavigator(
       {
         HomeNavigator: { screen: HomeNavigator },
@@ -66,7 +81,7 @@ export default class Router extends PureComponent {
         },
       }
     )
-    // AppNavigator = MainNavigator
+    //配置登陆页面
     AppNavigator = StackNavigator(
       {
         Login: { screen: Login },
@@ -104,11 +119,50 @@ export default class Router extends PureComponent {
         }),
       }
     )
-
+    //配置routerReducer
+    const initialState = AppNavigator.router.getStateForAction(AppNavigator.router.getActionForPathAndParams('Login'))
+    let routerReducer = (state = initialState, action = {}) => {
+      const nextState = AppNavigator.router.getStateForAction(action, state);
+      return nextState || state;
+    }
+    //配置router的Model
+    const routerReducerModel = {
+      namespace: 'router',
+      state: {
+        ...routerReducer(),
+      },
+      reducers: {
+        apply(state, { payload: action }) {
+          return routerReducer(state, action)
+        },
+      },
+      effects: {
+        watch: [
+          function* watch({ take, call, put }) {
+            while (true) {
+              const payload = yield take(actions)
+              yield put({
+                type: 'apply',
+                payload,
+              })
+              // debounce, see https://github.com/react-community/react-navigation/issues/271
+              if (payload.type === 'Navigation/NAVIGATE') {
+                yield call(delay, 500)
+              }
+            }
+          },
+          { type: 'watcher' },
+        ],
+      },
+    }
+    //注册router的reducer
+    _registerRouteModel(routerReducerModel)
+    //监听安卓回退事件
     BackHandler.addEventListener('hardwareBackPress', this.backHandle)
   }
 
   componentWillUnmount() {
+    //移除安卓回退事件
     BackHandler.removeEventListener('hardwareBackPress', this.backHandle)
   }
 
@@ -125,22 +179,20 @@ export default class Router extends PureComponent {
   }
 
   render() {
-    // const { dispatch, app, router } = this.props
-    // if (app.loading) return <Loading />
-    // const navigation = addNavigationHelpers({
-    //   dispatch,
-    //   state: router,
-    //   addListener,
-    // })
-    //
+    console.log(getCurrentScreen(this.props.router),'render')
+    const { dispatch,router } = this.props
+    if(!router) return <AppNavigator/>
+    const navigation = addNavigationHelpers({
+      dispatch,
+      state: router,
+      addListener,
+    })
     return (
       <AppNavigator
-      // navigation={navigation}
+        navigation={navigation}
       />
     )
   }
 }
 
-// export function routerReducer(state, action = {}) {
-//   return AppNavigator ? AppNavigator.router.getStateForAction(action, state) : null
-// }
+

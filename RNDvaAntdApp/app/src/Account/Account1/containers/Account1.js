@@ -1,8 +1,8 @@
 import React from 'react'
-import { connect } from 'react-redux'
 
 import { Button } from '../../../../components'
 import { StyleSheet, Image, Text } from 'react-native'
+import { connect } from 'react-redux'
 @connect(state => ({}))
 export default class Account1 extends React.Component {
   static navigationOptions = {
