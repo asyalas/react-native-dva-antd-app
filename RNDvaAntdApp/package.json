@@ -2,11 +2,21 @@
   "name": "RNDvaAntdApp",
   "version": "0.1.0",
   "private": true,
+  "description": "react-native app with dva and antd-mobile",
   "devDependencies": {
     "babel-preset-react-native-stage-0": "^1.0.1",
     "jest-react-native": "^18.0.0",
     "react-test-renderer": "16.2.0"
   },
+  "keywords": [
+    "Android",
+    "IOS",
+    "dva",
+    "react-native",
+    "antd",
+    "antd-mobile",
+    "react-navigation"
+  ],
   "scripts": {
     "start": "react-native start",
     "android": "react-native run-android",
