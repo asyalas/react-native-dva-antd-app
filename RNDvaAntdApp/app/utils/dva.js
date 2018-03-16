@@ -1,7 +1,6 @@
 import React from 'react'
 import { create } from 'dva-core'
 import { Provider, connect } from 'react-redux'
-
 import createLoading from 'dva-loading'
 
 export { connect }
@@ -61,7 +60,7 @@ export default options => {
   // 2.插件
   app.use(createLoading({ effects: true }))
   const store = app._store
-  app.start = Router => () => <Provider store={store}>{<Router _route={_route} _registerRouteModel={app.model}/>}</Provider>
+  app.start = Router => () => <Provider store={store}>{<Router _route={_route} _registerRouteModel={app.model} />}</Provider>
   app.getStore = () => store
   return app
 }

@@ -13,7 +13,7 @@ export default class Account3 extends React.Component {
     return {
       title: params ? params.name : 'Account3的标题',
       headerRight: (
-        <_Button onPress={params.changeCount} title="+1" color="#fff" />
+        <_Button onPress={params?params.changeCount:null} title="+1" color="#fff" />
       ),
     }
   }

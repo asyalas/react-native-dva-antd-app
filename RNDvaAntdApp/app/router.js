@@ -10,18 +10,14 @@ import {
 import {
   createReduxBoundAddListener,
   createReactNavigationReduxMiddleware,
+  initializeListeners
+
 } from 'react-navigation-redux-helpers'
 import Login from './src/Login'
 import { delay, } from './utils'
 import { connect } from 'react-redux'
-const actions = [
-  NavigationActions.BACK,
-  NavigationActions.INIT,
-  NavigationActions.NAVIGATE,
-  NavigationActions.RESET,
-  NavigationActions.SET_PARAMS,
-  NavigationActions.URI,
-]
+
+const actions = [...Object.values(NavigationActions).filter(item=>typeof(item)==='string')]
 
 
 //react-navigation中间件
@@ -40,14 +36,13 @@ function getCurrentScreen(navigationState) {
   }
   return route.routeName
 }
-let AppNavigator
+let AppNavigator, routerReducer
 
 const addListener = createReduxBoundAddListener('root')
 
-@connect(({router}) =>({router}))
+@connect(({ router }) => ({ router }))
 export default class Router extends PureComponent {
   componentWillMount() {
-    console.log('componentWillMount')
     const { tabBar, route } = this.props._route;
     const { _registerRouteModel } = this.props;
     //配置tabBar
@@ -69,6 +64,7 @@ export default class Router extends PureComponent {
         ...route,
       },
       {
+        // initialRouteName : 'HomeNavigator',
         headerMode: 'float',
         navigationOptions: {
           headerStyle: {
@@ -85,7 +81,7 @@ export default class Router extends PureComponent {
     AppNavigator = StackNavigator(
       {
         Login: { screen: Login },
-        Main: { screen: MainNavigator },
+        Main: { screen:MainNavigator  },
       },
       {
         headerMode: 'none',
@@ -121,7 +117,7 @@ export default class Router extends PureComponent {
     )
     //配置routerReducer
     const initialState = AppNavigator.router.getStateForAction(AppNavigator.router.getActionForPathAndParams('Login'))
-    let routerReducer = (state = initialState, action = {}) => {
+    routerReducer = (state = initialState, action = {}) => {
       const nextState = AppNavigator.router.getStateForAction(action, state);
       return nextState || state;
     }
@@ -145,10 +141,11 @@ export default class Router extends PureComponent {
                 type: 'apply',
                 payload,
               })
+              
               // debounce, see https://github.com/react-community/react-navigation/issues/271
-              if (payload.type === 'Navigation/NAVIGATE') {
-                yield call(delay, 500)
-              }
+              // if (payload.type === 'Navigation/NAVIGATE') {
+              //   yield call(delay, 500)
+              // }
             }
           },
           { type: 'watcher' },
@@ -157,10 +154,11 @@ export default class Router extends PureComponent {
     }
     //注册router的reducer
     _registerRouteModel(routerReducerModel)
+  }
+  componentDidMount() {
     //监听安卓回退事件
     BackHandler.addEventListener('hardwareBackPress', this.backHandle)
   }
-
   componentWillUnmount() {
     //移除安卓回退事件
     BackHandler.removeEventListener('hardwareBackPress', this.backHandle)
@@ -179,9 +177,9 @@ export default class Router extends PureComponent {
   }
 
   render() {
-    console.log(getCurrentScreen(this.props.router),'render')
-    const { dispatch,router } = this.props
-    if(!router) return <AppNavigator/>
+    
+    const { dispatch, router } = this.props
+    if (!router) return <AppNavigator />
     const navigation = addNavigationHelpers({
       dispatch,
       state: router,

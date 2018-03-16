@@ -10,6 +10,6 @@ export default class Home2 extends React.Component {
   componentDidMount() {}
 
   render() {
-    return <Text />
+    return <Text>home2</Text>
   }
 }
